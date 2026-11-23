@@ -215,7 +215,7 @@ header {
   touch-action: manipulation;
 }
 
-.slot.has-image .remove-btn {
+.slot.has-image.show-delete .remove-btn {
   display: flex;
 }
 
@@ -354,6 +354,7 @@ function render(direction) {
     const imgData = page.images[i];
     const existingImg = slot.querySelector('img');
     if (existingImg) existingImg.remove();
+    slot.classList.remove('show-delete');
 
     if (imgData) {
       const img = document.createElement('img');
@@ -420,6 +421,12 @@ function handleFile(e) {
   fileInput.value = '';
 }
 
+function clearDeleteButtons(exceptSlot) {
+  slots.forEach(slot => {
+    if (slot !== exceptSlot) slot.classList.remove('show-delete');
+  });
+}
+
 function removeImage(index, e) {
   e.preventDefault();
   e.stopPropagation();
@@ -438,12 +445,30 @@ slots.forEach(slot => {
       return;
     }
     if (e.target.closest('.remove-btn')) return;
+
+    // Filled image: first tap shows delete; empty slot opens picker
+    if (slot.classList.contains('has-image')) {
+      const alreadyShowing = slot.classList.contains('show-delete');
+      clearDeleteButtons(slot);
+      if (alreadyShowing) {
+        slot.classList.remove('show-delete');
+      } else {
+        slot.classList.add('show-delete');
+      }
+      return;
+    }
+
+    clearDeleteButtons();
     triggerFile(idx);
   });
   const removeBtn = slot.querySelector('.remove-btn');
   if (removeBtn) {
     removeBtn.addEventListener('click', (e) => removeImage(idx, e));
   }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.slot')) clearDeleteButtons();
 });
 
 pageTitleInput.addEventListener('input', handleTitleInput);
