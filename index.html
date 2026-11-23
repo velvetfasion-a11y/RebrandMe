@@ -2,51 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>RebrandMe</title>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --text: #ffffff;
   --muted: rgba(255, 255, 255, 0.5);
+  --header-h: 72px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  touch-action: none;
+}
+
 body {
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
   height: 100dvh;
   background: #000000;
   color: var(--text);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   padding: 0;
   margin: 0;
-  overflow: hidden;
-  -webkit-overflow-scrolling: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 header {
   text-align: center;
-  padding: 12px 16px 6px;
+  padding: 8px 12px 4px;
+  padding-top: max(8px, var(--safe-top));
   width: 100%;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   z-index: 10;
-  padding-top: max(12px, env(safe-area-inset-top));
 }
 
 .app-title {
   font-family: 'Bodoni Moda', serif;
-  font-size: 2.9rem;
+  font-size: clamp(1.25rem, 5.5vw, 2.4rem);
   font-weight: 500;
   letter-spacing: 0.5px;
   color: #ffffff;
-  text-transform: none;
-  margin-bottom: 4px;
-  font-style: normal;
+  line-height: 1.1;
+  margin-bottom: 2px;
 }
 
 #pageTitle {
@@ -54,18 +67,19 @@ header {
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 0;
-  padding: 6px 4px;
+  padding: 4px 4px;
   font-family: 'Bodoni Moda', serif;
-  font-size: 1.55rem;
+  font-size: clamp(0.9rem, 3.8vw, 1.35rem);
   font-weight: 500;
-  font-style: normal;
   color: #ffffff;
   text-align: center;
-  text-transform: none;
   letter-spacing: 0.3px;
   width: min(480px, 90vw);
   outline: none;
   transition: border-color 0.2s ease;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
 }
 
 #pageTitle:focus {
@@ -75,34 +89,31 @@ header {
 #pageTitle::placeholder {
   color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0.5px;
 }
 
 .main-container {
-  flex: 1;
+  flex: 1 1 auto;
   width: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 10px 8px;
-  min-height: 0;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 2px 8px max(6px, var(--safe-bottom));
   overflow: hidden;
 }
 
 .collage-wrapper {
   width: 100%;
-  max-width: 100%;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   position: relative;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  padding: 0 4px;
+  touch-action: none;
+  padding: 0 2px 18px;
+  overflow: hidden;
 }
 
 .collage {
@@ -114,10 +125,30 @@ header {
     "tall midright"
     "smallleft midright"
     "bottom bottom";
-  gap: 8px;
+  gap: clamp(4px, 1.2vw, 8px);
   width: 100%;
   height: 100%;
   max-height: 100%;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+  will-change: transform, opacity;
+}
+
+.collage.slide-left {
+  animation: slideInFromRight 0.28s ease;
+}
+
+.collage.slide-right {
+  animation: slideInFromLeft 0.28s ease;
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(28%); opacity: 0.35; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-28%); opacity: 0.35; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 .slot {
@@ -126,17 +157,18 @@ header {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1.5px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
+  border-radius: clamp(10px, 2.5vw, 16px);
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: border-color 0.25s ease, background 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: pan-y;
+  touch-action: none;
+  min-height: 0;
 }
 
-.slot:hover {
+.slot:active {
   border-color: rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.12);
 }
@@ -151,29 +183,22 @@ header {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 16px;
-  pointer-events: none; /* let parent handle swipes and clicks */
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .plus {
   font-family: 'Outfit', sans-serif;
-  font-size: 3rem;
+  font-size: clamp(1.6rem, 7vw, 3rem);
   font-weight: 300;
   color: rgba(255, 255, 255, 0.45);
-  user-select: none;
   pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-.slot:hover .plus {
-  transform: scale(1.08);
-  color: #ffffff;
 }
 
 .remove-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   width: 28px;
   height: 28px;
   background: rgba(0, 0, 0, 0.55);
@@ -187,65 +212,54 @@ header {
   align-items: center;
   justify-content: center;
   z-index: 2;
-  transition: background 0.2s;
+  touch-action: manipulation;
 }
 
-.slot.has-image:hover .remove-btn {
+.slot.has-image .remove-btn {
   display: flex;
 }
 
-.remove-btn:hover {
+.remove-btn:active {
   background: rgba(220, 38, 38, 0.85);
 }
 
 .page-indicator {
   position: absolute;
-  bottom: 8px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
   font-family: 'Outfit', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.45);
   letter-spacing: 1px;
+  pointer-events: none;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.swipe-hint {
+  position: absolute;
+  bottom: 2px;
+  right: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.28);
+  letter-spacing: 0.4px;
   pointer-events: none;
   z-index: 5;
 }
 
 @media (max-width: 640px) {
-  .app-title { 
-    font-size: 1.4rem; 
-    letter-spacing: 0.2px; 
-    margin-bottom: 0;
-    line-height: 1.1;
-  }
-  #pageTitle { 
-    font-size: 0.95rem; 
-    padding: 2px 2px;
-    margin-top: 2px;
-  }
-  .collage { 
-    gap: 5px; 
-  }
-  .plus { 
-    font-size: 1.8rem; 
-  }
-  .slot {
-    border-radius: 10px;
-  }
-  .slot img {
-    border-radius: 10px;
+  header {
+    padding: 4px 8px 2px;
+    padding-top: max(4px, var(--safe-top));
   }
   .main-container {
-    padding: 0 4px 4px;
+    padding: 0 4px max(4px, var(--safe-bottom));
   }
-  header {
-    padding: 4px 8px 0;
-    padding-top: max(4px, env(safe-area-inset-top));
-  }
-  .page-indicator {
-    font-size: 0.55rem;
-    bottom: 2px;
+  .collage-wrapper {
+    padding: 0 2px 16px;
   }
 }
 </style>
@@ -253,7 +267,7 @@ header {
 <body>
 <header>
   <h1 class="app-title">RebrandMe</h1>
-  <input id="pageTitle" type="text" placeholder="RebrandMe" maxlength="40">
+  <input id="pageTitle" type="text" placeholder="Name this collage" maxlength="40" enterkeyhint="done">
 </header>
 
 <div class="main-container">
@@ -261,26 +275,27 @@ header {
     <div class="collage" id="collage">
       <div class="slot" data-index="0" style="grid-area: tall;">
         <span class="plus">+</span>
-        <button class="remove-btn" data-index="0">×</button>
+        <button type="button" class="remove-btn" aria-label="Remove image" data-index="0">×</button>
       </div>
       <div class="slot" data-index="1" style="grid-area: topright;">
         <span class="plus">+</span>
-        <button class="remove-btn" data-index="1">×</button>
+        <button type="button" class="remove-btn" aria-label="Remove image" data-index="1">×</button>
       </div>
       <div class="slot" data-index="2" style="grid-area: midright;">
         <span class="plus">+</span>
-        <button class="remove-btn" data-index="2">×</button>
+        <button type="button" class="remove-btn" aria-label="Remove image" data-index="2">×</button>
       </div>
       <div class="slot" data-index="3" style="grid-area: smallleft;">
         <span class="plus">+</span>
-        <button class="remove-btn" data-index="3">×</button>
+        <button type="button" class="remove-btn" aria-label="Remove image" data-index="3">×</button>
       </div>
       <div class="slot" data-index="4" style="grid-area: bottom;">
         <span class="plus">+</span>
-        <button class="remove-btn" data-index="4">×</button>
+        <button type="button" class="remove-btn" aria-label="Remove image" data-index="4">×</button>
       </div>
     </div>
     <div class="page-indicator" id="pageIndicator">1 / 1</div>
+    <div class="swipe-hint" id="swipeHint">swipe ← →</div>
   </div>
 </div>
 
@@ -292,27 +307,33 @@ const STORAGE_KEY = 'rebrandme_collages_v1';
 let pages = [];
 let currentIndex = 0;
 let activeSlot = null;
+let wasSwipe = false;
+let animating = false;
 
 const collage = document.getElementById('collage');
 const pageTitleInput = document.getElementById('pageTitle');
 const pageIndicator = document.getElementById('pageIndicator');
+const swipeHint = document.getElementById('swipeHint');
 const fileInput = document.getElementById('fileInput');
 const slots = document.querySelectorAll('.slot');
+const wrapper = document.getElementById('collageWrapper');
+
+function blankPage() {
+  return { title: '', images: [null, null, null, null, null] };
+}
 
 function loadPages() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      pages = JSON.parse(saved);
-    }
+    if (saved) pages = JSON.parse(saved);
   } catch (e) {
     console.warn('Could not load saved collages');
   }
-  if (!pages.length) {
-    pages = [{ title: '', images: [null, null, null, null, null] }];
+  if (!Array.isArray(pages) || !pages.length) {
+    pages = [blankPage()];
   }
   pages.forEach(p => {
-    if (!p.images || p.images.length !== 5) p.images = [null,null,null,null,null];
+    if (!p.images || p.images.length !== 5) p.images = [null, null, null, null, null];
     if (typeof p.title !== 'string') p.title = '';
   });
 }
@@ -325,10 +346,9 @@ function savePages() {
   }
 }
 
-function render() {
+function render(direction) {
   const page = pages[currentIndex];
   pageTitleInput.value = page.title || '';
-  pageTitleInput.placeholder = 'RebrandMe';
 
   slots.forEach((slot, i) => {
     const imgData = page.images[i];
@@ -349,16 +369,31 @@ function render() {
   });
 
   pageIndicator.textContent = `${currentIndex + 1} / ${pages.length}`;
+  swipeHint.textContent = currentIndex === pages.length - 1 ? 'swipe ← new' : 'swipe ← →';
+
+  if (direction) {
+    collage.classList.remove('slide-left', 'slide-right');
+    // Force reflow so animation restarts
+    void collage.offsetWidth;
+    collage.classList.add(direction === 'next' ? 'slide-left' : 'slide-right');
+  }
 }
 
-function goTo(index) {
+function goTo(index, direction) {
+  if (animating) return;
   if (index < 0) return;
+
   if (index >= pages.length) {
-    pages.push({ title: '', images: [null, null, null, null, null] });
+    // Only add a fresh page when moving past the last one
+    pages.push(blankPage());
     savePages();
   }
+
+  const dir = direction || (index > currentIndex ? 'next' : 'prev');
   currentIndex = index;
-  render();
+  animating = true;
+  render(dir);
+  setTimeout(() => { animating = false; }, 280);
 }
 
 function handleTitleInput() {
@@ -386,17 +421,15 @@ function handleFile(e) {
 }
 
 function removeImage(index, e) {
+  e.preventDefault();
   e.stopPropagation();
   pages[currentIndex].images[index] = null;
   savePages();
   render();
 }
 
-// Event listeners
-let wasSwipe = false;
-
 slots.forEach(slot => {
-  const idx = parseInt(slot.dataset.index);
+  const idx = parseInt(slot.dataset.index, 10);
   slot.addEventListener('click', (e) => {
     if (wasSwipe) {
       e.preventDefault();
@@ -404,6 +437,7 @@ slots.forEach(slot => {
       wasSwipe = false;
       return;
     }
+    if (e.target.closest('.remove-btn')) return;
     triggerFile(idx);
   });
   const removeBtn = slot.querySelector('.remove-btn');
@@ -414,75 +448,119 @@ slots.forEach(slot => {
 
 pageTitleInput.addEventListener('input', handleTitleInput);
 pageTitleInput.addEventListener('change', handleTitleInput);
+pageTitleInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    pageTitleInput.blur();
+  }
+});
 
 fileInput.addEventListener('change', handleFile);
 
-// Improved swipe support (pointer events for better reliability on touch + mouse)
+// Horizontal swipe: touch + pointer for phones and desktop
 let startX = 0;
 let startY = 0;
-let isPointerDown = false;
+let isTracking = false;
 let hasMoved = false;
+let lockedAxis = null; // 'x' | 'y' | null
 
-const wrapper = document.getElementById('collageWrapper');
-
-function handlePointerDown(e) {
-  // Ignore only remove button and inputs — allow swipe to start on images/slots
-  if (e.target.closest('.remove-btn') || e.target.closest('input')) return;
-  startX = e.clientX;
-  startY = e.clientY;
-  isPointerDown = true;
+function beginSwipe(x, y, target) {
+  if (target.closest('.remove-btn') || target.closest('input')) return false;
+  startX = x;
+  startY = y;
+  isTracking = true;
   hasMoved = false;
+  lockedAxis = null;
   wasSwipe = false;
+  return true;
 }
 
-function handlePointerMove(e) {
-  if (!isPointerDown) return;
-  const dx = Math.abs(e.clientX - startX);
-  const dy = Math.abs(e.clientY - startY);
-  if (dx > 10 || dy > 10) hasMoved = true;
-}
+function moveSwipe(x, y) {
+  if (!isTracking) return;
+  const dx = x - startX;
+  const dy = y - startY;
+  const adx = Math.abs(dx);
+  const ady = Math.abs(dy);
 
-function handlePointerUp(e) {
-  if (!isPointerDown) return;
-  isPointerDown = false;
+  if (!lockedAxis && (adx > 8 || ady > 8)) {
+    lockedAxis = adx > ady ? 'x' : 'y';
+    hasMoved = true;
+  }
 
-  if (!hasMoved) return; // treat as click, not swipe
-
-  const endX = e.clientX;
-  const diffX = startX - endX;
-  const diffY = Math.abs(startY - e.clientY);
-
-  // Require mostly horizontal movement
-  if (Math.abs(diffX) > 40 && Math.abs(diffX) > diffY * 1.5) {
-    wasSwipe = true;
-    if (diffX > 0) {
-      goTo(currentIndex + 1); // swipe left → next
-    } else {
-      goTo(currentIndex - 1); // swipe right → prev
-    }
-    // Prevent any following click
-    e.preventDefault();
-    e.stopPropagation();
+  if (lockedAxis === 'x') {
+    // Light drag feedback while swiping
+    const drag = Math.max(-60, Math.min(60, dx * 0.35));
+    collage.style.transform = `translateX(${drag}px)`;
+    collage.style.opacity = String(1 - Math.min(0.35, Math.abs(dx) / 280));
   }
 }
 
-wrapper.addEventListener('pointerdown', handlePointerDown);
-document.addEventListener('pointermove', handlePointerMove);
-document.addEventListener('pointerup', handlePointerUp);
-document.addEventListener('pointercancel', () => { isPointerDown = false; });
+function endSwipe(x, y) {
+  if (!isTracking) return;
+  isTracking = false;
 
-// Prevent text selection while swiping
-wrapper.style.userSelect = 'none';
-wrapper.style.webkitUserSelect = 'none';
+  collage.style.transform = '';
+  collage.style.opacity = '';
 
-// Keyboard still works for convenience
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
-  if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+  if (!hasMoved || lockedAxis !== 'x') return;
+
+  const diffX = startX - x;
+  const diffY = Math.abs(startY - y);
+
+  if (Math.abs(diffX) > 36 && Math.abs(diffX) > diffY * 1.15) {
+    wasSwipe = true;
+    if (diffX > 0) {
+      goTo(currentIndex + 1, 'next'); // swipe left → next / new page
+    } else {
+      goTo(currentIndex - 1, 'prev'); // swipe right → previous
+    }
+    // Clear click ghost on next tick
+    setTimeout(() => { wasSwipe = false; }, 320);
+  }
+}
+
+wrapper.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  beginSwipe(e.clientX, e.clientY, e.target);
+  if (isTracking && e.pointerType !== 'mouse') {
+    try { wrapper.setPointerCapture(e.pointerId); } catch (_) {}
+  }
 });
 
-// Init
+wrapper.addEventListener('pointermove', (e) => {
+  moveSwipe(e.clientX, e.clientY);
+});
+
+wrapper.addEventListener('pointerup', (e) => {
+  endSwipe(e.clientX, e.clientY);
+});
+
+wrapper.addEventListener('pointercancel', () => {
+  isTracking = false;
+  collage.style.transform = '';
+  collage.style.opacity = '';
+});
+
+// Block browser overscroll / pull-to-refresh interference
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('input')) return;
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft') goTo(currentIndex - 1, 'prev');
+  if (e.key === 'ArrowRight') goTo(currentIndex + 1, 'next');
+});
+
+// Keep layout locked when mobile browser chrome shows/hides
+function lockViewport() {
+  document.body.style.height = `${window.innerHeight}px`;
+}
+window.addEventListener('resize', lockViewport);
+window.addEventListener('orientationchange', () => setTimeout(lockViewport, 120));
+lockViewport();
+
 loadPages();
 render();
 </script>
